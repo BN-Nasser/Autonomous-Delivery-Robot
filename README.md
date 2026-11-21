@@ -6,17 +6,43 @@
   <img src="https://img.shields.io/badge/Android-Native-3DDC84?style=for-the-badge&logo=android&logoColor=white" />
   <img src="https://img.shields.io/badge/AI-YOLOv8-00FFFF?style=for-the-badge&logo=yolo&logoColor=black" />
   <img src="https://img.shields.io/badge/Python-3.10-3776AB?style=for-the-badge&logo=python&logoColor=white" />
+  <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" />
 </div>
 
 <br />
 
 > **A state-of-the-art indoor delivery solution integrating autonomous mobile robotics, advanced AI perception, and a seamless mobile user experience.**
 
+<p align="center">
+  <a href="https://lnkd.in/p/ejVc_kCz">
+    <img src="docs/demo.gif" alt="Autonomous Delivery Robot - mechanical design preview" width="640">
+  </a>
+  <br>
+  <sub>Mechanical design preview (SolidWorks). Click the animation to watch the full demo on LinkedIn.</sub>
+</p>
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Key Features](#key-features)
+- [System Architecture](#system-architecture)
+- [AI Chatbot Assistant (Rafiq)](#ai-chatbot-assistant-rafiq)
+- [Live Dashboard](#live-dashboard)
+- [Getting Started](#getting-started)
+- [Usage Guide](#usage-guide)
+- [Repository Structure](#repository-structure)
+- [Technical Details](#technical-details)
+- [Future Improvements](#future-improvements)
+- [Contributors](#contributors)
+- [Acknowledgments](#acknowledgments)
+
 ---
 
 ## Overview
 
 The **Autonomous Delivery Robot System** is a sophisticated mechatronics project designed to automate indoor logistics (labs, offices, cafeterias). Built upon the **Andino** robot platform and powered by **ROS 2 Humble**, this system features a fully autonomous navigation stack, a dedicated **Android mobile application** for control and ordering, and an intelligent **AI interaction layer** that uses Computer Vision to verify recipients and confirm successful deliveries via natural hand gestures.
+
+Watch the full project demo on [LinkedIn](https://lnkd.in/p/ejVc_kCz).
 
 ---
 
@@ -38,7 +64,7 @@ The robot goes beyond simple navigation with advanced AI modules:
 
 ### Autonomous Operations
 *   **Nav2 Navigation**: Uses SLAM for mapping and the ROS 2 Navigation Stack for path planning and localization.
-*   **Auto-Return**: Automatically returns to the charging dock/home position after delivery confirmation.
+*   **Auto-Return**: Automatically returns to the home position after delivery confirmation (autonomous self-docking is planned, see Future Improvements).
 
 ---
 
@@ -96,7 +122,7 @@ The project is divided into three main layers:
 
 ---
 
-## 🤖 AI Chatbot Assistant (Rafiq)
+## AI Chatbot Assistant (Rafiq)
 
 The robot features a sophisticated **AI-powered conversational assistant** named **Rafiq (رفيق)** that provides natural language interaction in both **Arabic and English**. This is not a simple scripted chatbot—it's a fully integrated AI system with voice capabilities and real-world robot control.
 
@@ -153,19 +179,29 @@ The robot features a sophisticated **AI-powered conversational assistant** named
 | `/app/goal_name` | `std_msgs/String` | Publish | Navigation commands |
 | `/cmd_vel` | `geometry_msgs/Twist` | Publish | Direct motion control |
 
+### Model Setup
+
+The chatbot launch file selects these models and repositories:
+
+- **LLM:** `Qwen/Qwen2.5-Coder-3B-Instruct-GGUF`, file `qwen2.5-coder-3b-instruct-q4_k_m.gguf`.
+- **Whisper:** `ggerganov/whisper.cpp`, file `ggml-small.bin`, configured for Arabic transcription.
+- **Piper voice:** `rhasspy/piper-voices`, voice `en/en_US/lessac/medium/en_US-lessac-medium.onnx` with matching `en/en_US/lessac/medium/en_US-lessac-medium.onnx.json` configuration.
+
+The launch files use Hugging Face repository names and filenames; they download or resolve the model files through the ROS packages rather than defining a repository-local model directory. The `chat_bridge.py` bridge does not specify model paths.
+
 ---
 
-## 📊 Live Dashboard
+## Live Dashboard
 
 A real-time **analytics dashboard** built with **Streamlit** that automatically synchronizes with the robot and provides comprehensive monitoring of all delivery operations.
 
 ### Dashboard Features
 
-*   **� Auto-Sync**: Dashboard automatically refreshes every 5 seconds to stay synchronized with live robot data.
-*   **�📦 KPI Metrics**: Total orders, success rate, top destination, average trip duration.
+*   **🔄 Auto-Sync**: Dashboard automatically refreshes every 5 seconds to stay synchronized with live robot data.
+*   **📦 KPI Metrics**: Total orders, success rate, top destination, average trip duration.
 *   **📈 Interactive Charts**: Orders over time, status distribution (pie chart), hourly volume analysis.
 *   **📋 Activity Log**: Recent deliveries with status highlighting.
-*   **� Custom Date Range**: Filter data by Today, Last Week, Last Month, Last Year, or **any custom date range**.
+*   **📅 Custom Date Range**: Filter data by Today, Last Week, Last Month, Last Year, or **any custom date range**.
 *   **📥 Export Options**: 
     - **CSV Download**: Export filtered data for any selected time period.
     - **PDF Reports**: Generate professional PDF reports with charts for any custom date range.
@@ -187,6 +223,7 @@ The dashboard displays:
 - **Header**: Robot logo and title "Autonomous Delivery Dashboard"
 - **Sidebar**: Time period filters (Today, Last Week, Last Month, Custom Range)
 - **Main Panel**: 4 KPI cards → Time series chart → Pie chart → Busy hours analysis → Data table
+<!-- TODO: add screenshots to docs/ and reference them here -->
 
 ### Running the Dashboard
 
@@ -216,7 +253,7 @@ The dashboard automatically reads from `delivery_log.csv` which is populated by 
 1.  **Clone the Repository**
     ```bash
     cd ~
-    git clone https://github.com/MO-NASSER9/Autonomous-Delivery-Robot.git
+    git clone https://github.com/BN-Nasser/Autonomous-Delivery-Robot.git
     mv Autonomous-Delivery-Robot ws
     cd ws
     ```
@@ -234,11 +271,25 @@ The dashboard automatically reads from `delivery_log.csv` which is populated by 
     source install/setup.bash
     ```
 
+### Building the Android App
+
+The Android project is in `mobile/DeliveryBotApp`. It uses Gradle, Android Gradle Plugin `8.5.2`, and Kotlin Android Plugin `1.9.24`. The app targets Android SDK `34`, has a minimum SDK of `24`, and sets the Java/Kotlin compatibility level to `17`.
+
+Open `mobile/DeliveryBotApp` in Android Studio or build the app with:
+
+```bash
+cd mobile/DeliveryBotApp
+./gradlew assembleDebug
+```
+
+The verified Gradle configuration produces a debug APK for application ID `com.example.deliverybot` and enables AndroidX and Jetifier.
+
 ---
 
 ## Usage Guide
 
-### 1️⃣ Simulation Mode (Gazebo & Office World)
+<details>
+<summary>Simulation Mode (Gazebo & Office World)</summary>
 
 Run the following commands in separate terminals to start the full simulation stack.
 
@@ -277,9 +328,12 @@ cd ws
 ./chat
 ```
 
+</details>
+
 ---
 
-### 2️⃣ Real Robot Operation
+<details>
+<summary>Real Robot Operation</summary>
 
 Follow these steps to run the software on the physical Andino robot.
 
@@ -339,6 +393,26 @@ cd ws
 ./chat
 ```
 
+</details>
+
+---
+
+## Repository Structure
+
+```text
+.
+├── map/              # Saved ROS 2 navigation maps and map metadata
+├── mission_proof/    # Mission evidence and dated proof assets
+├── mobile/           # Android app project and prebuilt app APK
+├── src/              # ROS 2 packages and application components
+├── test/             # Hardware, sensor, and integration test scripts
+├── app               # Executable launcher for the application backend
+├── chat              # Executable launcher for the Rafiq chatbot stack
+├── install_deps.sh   # Project dependency installation script
+├── requirements.txt  # Python dependencies
+└── docs/             # Project documentation assets
+```
+
 ---
 
 ## Technical Details
@@ -367,7 +441,7 @@ We are constantly working to enhance the capabilities of the Autonomous Delivery
 
 ### System Extensions
 *   **Multi-Floor Navigation**: Integrating with elevator IoT systems to allow the robot to traverse different floors autonomously.
-*   **Voice Interaction**: Adding advanced Natural Language Processing (NLP) to allow users to interact with the robot via voice commands.
+*   **Wake-Word Detection**: hands-free activation for the Rafiq voice assistant (speech recognition and synthesis are already supported offline).
 *   **Cloud Dashboard**: A web-based remote monitoring platform to view robot status, camera feeds, and analytics from anywhere over the internet.
 
 ---
